@@ -5,11 +5,16 @@ import { insertTeacherSchema, insertRatingSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Enhanced Teacher API routes
-  const API_BASE = "/enhanced-teacher";
+  // Enhanced Teacher API routes - Use environment variable for base URL
+  const BASE_URL = process.env.VITE_API_BASE_URL || "http://localhost:3000";
+  const API_VERSION = process.env.API_VERSION || "v1";
+  const API_BASE = `${BASE_URL}/enhanced-teacher`;
+  
+  // Alternative: If you just want the path without full URL
+  // const API_BASE = `/api/${API_VERSION}/enhanced-teacher`;
 
   // List all teachers
-  app.get(API_BASE, async (req, res) => {
+  app.get("/enhanced-teacher", async (req, res) => {
     try {
       const teachers = await storage.getAllTeachers();
       res.json(teachers);
@@ -19,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new teacher
-  app.post(API_BASE, async (req, res) => {
+  app.post("/enhanced-teacher", async (req, res) => {
     try {
       const validatedData = insertTeacherSchema.parse(req.body);
       const teacher = await storage.createTeacher(validatedData);
@@ -34,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific teacher
-  app.get(`${API_BASE}/:teacher_id`, async (req, res) => {
+  app.get("/enhanced-teacher/:teacher_id", async (req, res) => {
     try {
       const teacher = await storage.getTeacher(req.params.teacher_id);
       if (!teacher) {
@@ -47,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update teacher
-  app.put(`${API_BASE}/:teacher_id`, async (req, res) => {
+  app.put("/enhanced-teacher/:teacher_id", async (req, res) => {
     try {
       const updates = req.body;
       const teacher = await storage.updateTeacher(req.params.teacher_id, updates);
@@ -61,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete teacher
-  app.delete(`${API_BASE}/:teacher_id`, async (req, res) => {
+  app.delete("/enhanced-teacher/:teacher_id", async (req, res) => {
     try {
       const deleted = await storage.deleteTeacher(req.params.teacher_id);
       if (!deleted) {
@@ -74,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Search teachers with filters
-  app.get(`${API_BASE}/search`, async (req, res) => {
+  app.get("/enhanced-teacher/search", async (req, res) => {
     try {
       const filters = req.query;
       const result = await storage.searchTeachers(filters);
@@ -85,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get teachers by domain
-  app.get(`${API_BASE}/domain/:domain`, async (req, res) => {
+  app.get("/enhanced-teacher/domain/:domain", async (req, res) => {
     try {
       const teachers = await storage.getTeachersByDomain(req.params.domain);
       if (teachers.length === 0) {
@@ -98,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add teacher rating
-  app.post(`${API_BASE}/:teacher_id/rating`, async (req, res) => {
+  app.post("/enhanced-teacher/:teacher_id/rating", async (req, res) => {
     try {
       const ratingData = insertRatingSchema.parse({
         teacher_id: req.params.teacher_id,
@@ -116,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Increment session count
-  app.post(`${API_BASE}/:teacher_id/increment-session`, async (req, res) => {
+  app.post("/enhanced-teacher/:teacher_id/increment-session", async (req, res) => {
     try {
       const success = await storage.incrementSession(req.params.teacher_id);
       if (!success) {
@@ -129,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate system prompt
-  app.post(`${API_BASE}/:teacher_id/generate-prompt`, async (req, res) => {
+  app.post("/enhanced-teacher/:teacher_id/generate-prompt", async (req, res) => {
     try {
       const teacher = await storage.getTeacher(req.params.teacher_id);
       if (!teacher) {
@@ -157,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create default teachers
-  app.post(`${API_BASE}/create-defaults`, async (req, res) => {
+  app.post("/enhanced-teacher/create-defaults", async (req, res) => {
     try {
       const defaultTeachers = [
         {
@@ -251,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all available styles and options
-  app.get(`${API_BASE}/styles/all`, async (req, res) => {
+  app.get("/enhanced-teacher/styles/all", async (req, res) => {
     try {
       const styles = {
         teaching_styles: [

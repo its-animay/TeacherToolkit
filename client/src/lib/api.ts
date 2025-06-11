@@ -8,7 +8,7 @@ const getApiBaseUrl = (): string => {
   // Priority: localStorage > environment variable > default fallback
   return localStorage.getItem('enhanced_teacher_api_url') || 
          import.meta.env.VITE_API_BASE_URL || 
-         'http://localhost:5000';
+         'http://localhost:8090/api/v1';
 };
 
 // Enhanced API request function that uses the external API base URL
