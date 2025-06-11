@@ -245,36 +245,51 @@ export default function TutoringPlatformPage() {
               <CardContent className="p-0">
                 <ScrollArea className="h-[calc(100%-80px)]">
                   <div className="p-4 space-y-3">
-                    {MOCK_TEACHERS.map((teacher) => (
-                      <div
-                        key={teacher.id}
-                        className={`p-3 rounded-lg cursor-pointer transition-all border ${
-                          selectedTeacher?.id === teacher.id
-                            ? "bg-primary/10 border-primary"
-                            : "hover:bg-slate-50 border-transparent"
-                        }`}
-                        onClick={() => setSelectedTeacher(teacher)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="gradient-bg text-white text-xs">
-                              {teacher.name.split(" ").map(n => n[0]).join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{teacher.name}</p>
-                            <p className="text-xs text-slate-500">{teacher.domain}</p>
+                    {enhancedTeachers.length === 0 ? (
+                      <div className="text-center text-slate-500 text-sm p-4">
+                        <AlertCircle className="h-6 w-6 mx-auto mb-2" />
+                        <p>No teachers available</p>
+                        <p className="text-xs mt-1">Create teachers first in the Enhanced Teacher API</p>
+                      </div>
+                    ) : (
+                      enhancedTeachers.map((teacher: any) => (
+                        <div
+                          key={teacher.id}
+                          className={`p-3 rounded-lg cursor-pointer transition-all border ${
+                            selectedTeacher?.id === teacher.id
+                              ? "bg-primary/10 border-primary"
+                              : "hover:bg-slate-50 border-transparent"
+                          }`}
+                          onClick={() => setSelectedTeacher({
+                            id: teacher.id,
+                            name: teacher.name,
+                            domain: teacher.domain,
+                            teaching_style: teacher.teaching_style,
+                            personality_traits: teacher.personality_traits || [],
+                            expertise_areas: teacher.expertise_areas || []
+                          })}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="gradient-bg text-white text-xs">
+                                {teacher.name.split(" ").map((n: string) => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{teacher.name}</p>
+                              <p className="text-xs text-slate-500">{teacher.domain}</p>
+                            </div>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {(teacher.expertise_areas || []).slice(0, 2).map((area: string) => (
+                              <Badge key={area} variant="secondary" className="text-xs">
+                                {area}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {teacher.expertise_areas.slice(0, 2).map((area) => (
-                            <Badge key={area} variant="secondary" className="text-xs">
-                              {area}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </ScrollArea>
               </CardContent>
@@ -382,7 +397,7 @@ export default function TutoringPlatformPage() {
                     <div>
                       <CardTitle className="text-lg">{currentChat.title}</CardTitle>
                       <p className="text-sm text-slate-500">
-                        {MOCK_TEACHERS.find(t => t.id === currentChat.teacher_id)?.name}
+                        {enhancedTeachers.find((t: any) => t.id === currentChat.teacher_id)?.name || "Unknown Teacher"}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
