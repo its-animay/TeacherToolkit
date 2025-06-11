@@ -15,6 +15,7 @@ import ChatPage from "@/pages/ChatPage";
 import ChatDemoPage from "@/pages/ChatDemoPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import TutoringPlatformPage from "@/pages/TutoringPlatformPage";
 import Layout from "@/components/layout/Layout";
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/search" component={SearchPage} />
       <Route path="/analytics" component={AnalyticsPage} />
       <Route path="/settings" component={SettingsPage} />
+      <Route path="/tutoring" component={TutoringPlatformPage} />
       <Route component={NotFound} />
     </Switch>
   );

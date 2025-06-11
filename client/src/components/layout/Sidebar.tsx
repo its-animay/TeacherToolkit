@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { ChartPie, Users, PlusCircle, Search, BarChart3, Presentation, MessageCircle, Settings } from "lucide-react";
+import { ChartPie, Users, PlusCircle, Search, BarChart3, Presentation, MessageCircle, Settings, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -8,6 +8,7 @@ const navigation = [
   { name: "Create Teacher", href: "/create", icon: PlusCircle },
   { name: "Search & Filter", href: "/search", icon: Search },
   { name: "Chat Demo", href: "/chat", icon: MessageCircle },
+  { name: "AI Tutoring", href: "/tutoring", icon: Brain },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];

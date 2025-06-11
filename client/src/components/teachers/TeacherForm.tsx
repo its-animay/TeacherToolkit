@@ -205,7 +205,12 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                     <FormItem>
                       <FormLabel>Avatar URL</FormLabel>
                       <FormControl>
-                        <Input type="url" placeholder="https://example.com/avatar.jpg" {...field} />
+                        <Input 
+                          type="url" 
+                          placeholder="https://example.com/avatar.jpg" 
+                          {...field} 
+                          value={field.value ?? ""} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -223,6 +228,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                           rows={4}
                           placeholder="You are {teacher_name}, {title}..."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />
