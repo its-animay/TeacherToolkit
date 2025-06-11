@@ -11,68 +11,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { 
   Send, 
   MessageSquare, 
   Plus, 
-  Star, 
   Clock, 
   BookOpen, 
   Brain, 
   ChevronRight,
   Upload,
-  Trash2,
-  Settings,
   Play,
-  StopCircle
+  StopCircle,
+  AlertCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Rating } from "@/components/ui/rating";
 import { LoadingSpinner } from "@/components/ui/loading";
-
-// Types based on API documentation
-interface ChatSession {
-  id: string;
-  user_id: string;
-  teacher_id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  metadata: Record<string, any>;
-}
-
-interface Message {
-  id: string;
-  role: "system" | "user" | "assistant";
-  content: string;
-  timestamp: string;
-  metadata: {
-    teacher_id?: string;
-    teacher_name?: string;
-    domain?: string;
-    teaching_style?: string;
-    rag_enhanced?: boolean;
-    sources_used?: Array<{
-      title: string;
-      source: string;
-      score: number;
-    }>;
-    message_type?: string;
-    difficulty_preference?: string;
-    learning_style?: string;
-  };
-}
-
-interface KnowledgeBaseDoc {
-  title: string;
-  text: string;
-  source?: string;
-  domain?: string;
-  sub_domains?: string[];
-  difficulty_level?: "beginner" | "intermediate" | "advanced" | "expert";
-  tags?: string[];
-}
+import { tutoringAPI, type ChatSession, type Message, type KnowledgeBaseDoc } from "@/lib/tutoring-api";
+import { useTeachers } from "@/hooks/useTeachers";
 
 interface Teacher {
   id: string;
@@ -83,34 +39,6 @@ interface Teacher {
   expertise_areas: string[];
 }
 
-const MOCK_TEACHERS: Teacher[] = [
-  {
-    id: "teacher-uuid-123",
-    name: "Alex Rivera",
-    domain: "Programming",
-    teaching_style: "practical",
-    personality_traits: ["encouraging", "patient", "detail-oriented"],
-    expertise_areas: ["Python", "JavaScript", "Web Development"]
-  },
-  {
-    id: "teacher-uuid-456", 
-    name: "Dr. Sarah Chen",
-    domain: "Mathematics",
-    teaching_style: "structured",
-    personality_traits: ["analytical", "supportive", "methodical"],
-    expertise_areas: ["Calculus", "Linear Algebra", "Statistics"]
-  },
-  {
-    id: "teacher-uuid-789",
-    name: "Prof. Michael Johnson",
-    domain: "Physics",
-    teaching_style: "experimental",
-    personality_traits: ["curious", "innovative", "inspiring"],
-    expertise_areas: ["Quantum Physics", "Thermodynamics", "Mechanics"]
-  }
-];
-
-const API_BASE_URL = import.meta.env.VITE_TUTORING_API_URL || "https://api.tutoring-platform.com";
 const USER_ID = "user-123"; // In real app, get from auth context
 
 export default function TutoringPlatformPage() {
@@ -138,56 +66,37 @@ export default function TutoringPlatformPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // API functions
-  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        "X-User-ID": USER_ID,
-        ...options.headers,
-      },
-    });
+  // Get teachers from Enhanced Teacher API
+  const { data: enhancedTeachers = [] } = useTeachers();
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: "Network error" }));
-      throw new Error(error.detail || `HTTP ${response.status}`);
-    }
-
-    return response.json();
-  };
-
-  // Queries
+  // Queries using tutoring API
   const { data: chatSessions = [], isLoading: chatsLoading } = useQuery({
-    queryKey: ["/chat/"],
-    queryFn: () => apiRequest("/chat/"),
+    queryKey: ["tutoring-chats"],
+    queryFn: () => tutoringAPI.getUserChats(),
     enabled: true
   });
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery({
-    queryKey: ["/chat/history", currentChat?.id],
-    queryFn: () => apiRequest(`/chat/${currentChat?.id}/history`),
+    queryKey: ["tutoring-messages", currentChat?.id],
+    queryFn: () => tutoringAPI.getChatHistory(currentChat!.id),
     enabled: !!currentChat?.id
   });
 
   const { data: knowledgeInfo } = useQuery({
-    queryKey: ["/knowledge-base/collection", selectedTeacher?.id],
-    queryFn: () => apiRequest(`/knowledge-base/collection/${selectedTeacher?.id}`),
+    queryKey: ["knowledge-collection", selectedTeacher?.id],
+    queryFn: () => tutoringAPI.getCollectionInfo(selectedTeacher!.id),
     enabled: !!selectedTeacher?.id
   });
 
   // Mutations
   const startChatMutation = useMutation({
     mutationFn: (data: { teacher_id: string; title: string }) =>
-      apiRequest("/chat/start", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      tutoringAPI.startChat(data.teacher_id, data.title),
     onSuccess: (newChat) => {
       setCurrentChat(newChat);
       setShowNewChatDialog(false);
       setChatTitle("");
-      queryClient.invalidateQueries({ queryKey: ["/chat/"] });
+      queryClient.invalidateQueries({ queryKey: ["tutoring-chats"] });
       toast({
         title: "Chat Started",
         description: "New chat session created successfully",
@@ -204,14 +113,11 @@ export default function TutoringPlatformPage() {
 
   const sendMessageMutation = useMutation({
     mutationFn: (data: { content: string; metadata: any }) =>
-      apiRequest(`/chat/${currentChat?.id}/send`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      tutoringAPI.sendMessage(currentChat!.id, data.content, data.metadata),
     onSuccess: () => {
       setNewMessage("");
-      queryClient.invalidateQueries({ queryKey: ["/chat/history", currentChat?.id] });
-      queryClient.invalidateQueries({ queryKey: ["/chat/"] });
+      queryClient.invalidateQueries({ queryKey: ["tutoring-messages", currentChat?.id] });
+      queryClient.invalidateQueries({ queryKey: ["tutoring-chats"] });
     },
     onError: (error) => {
       toast({
@@ -224,10 +130,7 @@ export default function TutoringPlatformPage() {
 
   const rateMessageMutation = useMutation({
     mutationFn: (data: { messageId: string; rating: number }) =>
-      apiRequest(`/chat/${currentChat?.id}/message/${data.messageId}/rate`, {
-        method: "POST",
-        body: JSON.stringify({ rating: data.rating }),
-      }),
+      tutoringAPI.rateMessage(currentChat!.id, data.messageId, data.rating),
     onSuccess: () => {
       toast({
         title: "Rating submitted",
@@ -237,10 +140,10 @@ export default function TutoringPlatformPage() {
   });
 
   const endChatMutation = useMutation({
-    mutationFn: () => apiRequest(`/chat/${currentChat?.id}/end`, { method: "POST" }),
+    mutationFn: () => tutoringAPI.endChat(currentChat!.id),
     onSuccess: () => {
       setCurrentChat(null);
-      queryClient.invalidateQueries({ queryKey: ["/chat/"] });
+      queryClient.invalidateQueries({ queryKey: ["tutoring-chats"] });
       toast({
         title: "Chat ended",
         description: "Chat session has been ended",
@@ -250,10 +153,7 @@ export default function TutoringPlatformPage() {
 
   const addDocumentMutation = useMutation({
     mutationFn: (data: KnowledgeBaseDoc) =>
-      apiRequest(`/knowledge-base/document/${selectedTeacher?.id}`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      tutoringAPI.addDocument(selectedTeacher!.id, data),
     onSuccess: (result) => {
       setShowKnowledgeDialog(false);
       setKnowledgeDoc({
@@ -264,7 +164,7 @@ export default function TutoringPlatformPage() {
         difficulty_level: "beginner",
         tags: []
       });
-      queryClient.invalidateQueries({ queryKey: ["/knowledge-base/collection", selectedTeacher?.id] });
+      queryClient.invalidateQueries({ queryKey: ["knowledge-collection", selectedTeacher?.id] });
       toast({
         title: "Document added",
         description: `Successfully added ${result.count} document chunks`,
