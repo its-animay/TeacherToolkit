@@ -3,7 +3,7 @@ import { teacherApi } from "@/lib/api";
 
 export function useTeachers() {
   return useQuery({
-    queryKey: ["/enhanced-teacher"],
+    queryKey: ["enhanced-teachers"],
     queryFn: teacherApi.getTeachers,
     retry: false,
     throwOnError: false,
@@ -12,7 +12,7 @@ export function useTeachers() {
 
 export function useTeacher(id: string) {
   return useQuery({
-    queryKey: [`/enhanced-teacher/${id}`],
+    queryKey: ["enhanced-teacher", id],
     queryFn: () => teacherApi.getTeacher(id),
     enabled: !!id,
     retry: false,
@@ -22,7 +22,7 @@ export function useTeacher(id: string) {
 
 export function useSearchTeachers(filters: Record<string, any>) {
   return useQuery({
-    queryKey: ["/enhanced-teacher/search", filters],
+    queryKey: ["enhanced-teacher-search", filters],
     queryFn: () => teacherApi.searchTeachers(filters),
     enabled: Object.keys(filters).some(key => filters[key] !== undefined && filters[key] !== null && filters[key] !== ''),
     retry: false,
@@ -32,7 +32,7 @@ export function useSearchTeachers(filters: Record<string, any>) {
 
 export function useTeachersByDomain(domain: string) {
   return useQuery({
-    queryKey: [`/enhanced-teacher/domain/${domain}`],
+    queryKey: ["enhanced-teacher-domain", domain],
     queryFn: () => teacherApi.getTeachersByDomain(domain),
     enabled: !!domain,
     retry: false,
@@ -42,7 +42,7 @@ export function useTeachersByDomain(domain: string) {
 
 export function useStyles() {
   return useQuery({
-    queryKey: ["/enhanced-teacher/styles/all"],
+    queryKey: ["enhanced-teacher-styles"],
     queryFn: teacherApi.getStyles,
     retry: false,
     throwOnError: false,
