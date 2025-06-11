@@ -123,29 +123,32 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress Indicator */}
-      <div className="mb-8">
+      <div className="mb-12">
         <div className="flex items-center justify-center">
-          <div className="flex items-center w-full max-w-md">
+          <div className="flex items-center justify-between w-full max-w-2xl">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className="flex items-center text-center relative">
+              <div key={step.id} className="flex items-center flex-1">
+                <div className="flex flex-col items-center text-center w-full">
                   <div
-                    className={`rounded-full h-8 w-8 flex items-center justify-center text-sm font-medium transition-colors ${
+                    className={`rounded-full h-10 w-10 flex items-center justify-center text-sm font-medium transition-colors mb-2 ${
                       currentStep > step.id
-                        ? "bg-primary text-primary-foreground"
+                        ? "gradient-bg text-white"
                         : currentStep === step.id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                        ? "gradient-bg text-white"
+                        : "bg-slate-200 text-slate-600"
                     }`}
                   >
                     {currentStep > step.id ? <Check size={16} /> : step.id}
                   </div>
-                  <div className="absolute top-10 text-center mt-2 w-32 text-xs font-medium">
+                  <div className="text-xs font-medium text-slate-700 whitespace-nowrap">
                     {step.title}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1 whitespace-nowrap">
+                    {step.description}
                   </div>
                 </div>
                 {index < STEPS.length - 1 && (
-                  <div className="flex-auto border-t-2 mx-4 border-muted" />
+                  <div className="flex-1 h-px bg-slate-300 mx-4 mt-[-20px]" />
                 )}
               </div>
             ))}
