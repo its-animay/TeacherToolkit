@@ -1,0 +1,283 @@
+# Enhanced Teacher API React Application Development Prompt
+
+## Overview
+Create a modern, responsive React application that serves as a comprehensive management interface for the Enhanced Teacher API. The application should provide full CRUD functionality for managing AI teachers with their personalities, specializations, and teaching capabilities.
+
+## Technical Requirements
+
+### Tech Stack
+- **Frontend Framework**: React 18+ with functional components and hooks
+- **Styling**: Tailwind CSS for responsive design
+- **HTTP Client**: Axios for API integration
+- **State Management**: React Context API or useState/useReducer for local state
+- **Routing**: React Router for navigation
+- **Icons**: Lucide React for consistent iconography
+- **Form Handling**: React Hook Form for efficient form management
+- **API Base URL**: `http://localhost:3000` (configurable)
+
+### API Integration Requirements
+
+**Base URL**: `http://localhost:3000/enhanced-teacher`
+
+Implement the following API endpoints:
+
+1. **GET /** - List all teachers
+2. **POST /** - Create new teacher
+3. **GET /{teacher_id}** - Get specific teacher
+4. **PUT /{teacher_id}** - Update teacher
+5. **DELETE /{teacher_id}** - Delete teacher
+6. **GET /search** - Search teachers with filters
+7. **GET /domain/{domain}** - Get teachers by domain
+8. **POST /{teacher_id}/rating** - Add teacher rating
+9. **POST /{teacher_id}/increment-session** - Increment session count
+10. **POST /{teacher_id}/generate-prompt** - Generate system prompt
+11. **POST /create-defaults** - Create default teachers
+12. **GET /styles/all** - Get all available styles and options
+
+## Application Features & Pages
+
+### 1. Dashboard/Home Page
+- Overview statistics (total teachers, average ratings, etc.)
+- Quick actions (Create Teacher, Search, View All)
+- Recent activity feed
+- Featured teachers grid
+
+### 2. Teachers List Page
+- Paginated table/grid of all teachers
+- Search and filter functionality
+- Sort by name, rating, sessions, creation date
+- Quick actions (edit, delete, view details)
+- Bulk operations support
+
+### 3. Teacher Detail Page
+- Complete teacher profile view
+- Rating system with visual stars
+- Session history and statistics
+- Generated system prompt preview
+- Edit and delete actions
+
+### 4. Create/Edit Teacher Form
+- Multi-step form with validation
+- **Basic Info**: Name, title, avatar URL
+- **Personality Section**: 
+  - Primary traits (multi-select)
+  - Teaching style dropdown
+  - Formality level slider
+  - Question frequency, encouragement level
+  - Response length preferences
+  - Boolean toggles for examples/analogies
+  - Patience and humor level sliders
+  - Signature phrases (dynamic list)
+  - Empathy level
+- **Specialization Section**:
+  - Primary domain dropdown
+  - Multiple specializations (tags input)
+  - Difficulty range (min/max sliders)
+  - Capability toggles (exercises, grading, curriculum)
+  - External resources (dynamic list)
+- **Adaptation Settings**:
+  - Various boolean toggles for learning adaptation
+- Form validation with error messages
+- Save as draft functionality
+
+### 5. Search & Filter Page
+- Advanced search interface
+- Filters by:
+  - Domain/Subject
+  - Teaching style
+  - Difficulty level
+  - Personality traits
+  - Rating range
+  - Session count range
+- Real-time search results
+- Save search preferences
+
+### 6. Teacher Analytics Page
+- Individual teacher performance metrics
+- Rating trends over time
+- Session statistics
+- Popular teachers ranking
+- Usage patterns visualization
+
+## Component Structure
+
+### Core Components
+```
+src/
+├── components/
+│   ├── layout/
+│   │   ├── Header.jsx
+│   │   ├── Sidebar.jsx
+│   │   └── Layout.jsx
+│   ├── teachers/
+│   │   ├── TeacherCard.jsx
+│   │   ├── TeacherList.jsx
+│   │   ├── TeacherForm.jsx
+│   │   ├── TeacherDetail.jsx
+│   │   └── TeacherSearch.jsx
+│   ├── forms/
+│   │   ├── PersonalityForm.jsx
+│   │   ├── SpecializationForm.jsx
+│   │   └── AdaptationForm.jsx
+│   ├── ui/
+│   │   ├── Button.jsx
+│   │   ├── Input.jsx
+│   │   ├── Select.jsx
+│   │   ├── Modal.jsx
+│   │   ├── Rating.jsx
+│   │   └── LoadingSpinner.jsx
+│   └── common/
+│       ├── SearchBar.jsx
+│       ├── Pagination.jsx
+│       └── ConfirmDialog.jsx
+├── pages/
+│   ├── Dashboard.jsx
+│   ├── TeachersPage.jsx
+│   ├── TeacherDetailPage.jsx
+│   ├── CreateTeacherPage.jsx
+│   ├── EditTeacherPage.jsx
+│   └── SearchPage.jsx
+├── hooks/
+│   ├── useTeachers.js
+│   ├── useApi.js
+│   └── useSearch.js
+├── services/
+│   └── api.js
+├── contexts/
+│   └── TeacherContext.jsx
+└── utils/
+    ├── validation.js
+    └── helpers.js
+```
+
+## Key Features to Implement
+
+### 1. Responsive Design
+- Mobile-first approach
+- Tablet and desktop optimizations
+- Touch-friendly interactions
+- Accessible navigation
+
+### 2. State Management
+- Global state for teachers list
+- Local state for forms and UI
+- Optimistic updates for better UX
+- Error handling and loading states
+
+### 3. Form Handling
+- Multi-step form with progress indicator
+- Real-time validation
+- Auto-save functionality
+- Rich text editing for descriptions
+
+### 4. Search & Filtering
+- Debounced search input
+- Multiple filter criteria
+- Filter persistence in URL
+- Clear all filters option
+
+### 5. Data Visualization
+- Rating displays with stars
+- Progress bars for metrics
+- Charts for analytics (optional)
+
+### 6. User Experience
+- Loading skeletons
+- Empty states with helpful messages
+- Success/error notifications
+- Confirmation dialogs for destructive actions
+- Keyboard navigation support
+
+## Sample Data Structure
+
+Use this teacher object structure based on the API:
+
+```javascript
+const teacherExample = {
+  id: "uuid",
+  name: "Dr. Richard Feynman",
+  title: "Professor",
+  avatar_url: "https://example.com/avatar.jpg",
+  personality: {
+    primary_traits: ["analytical", "humorous", "creative"],
+    teaching_style: "socratic",
+    formality_level: "casual",
+    question_frequency: "high",
+    encouragement_level: "high",
+    response_length: "moderate",
+    use_examples: true,
+    use_analogies: true,
+    patience_level: "high",
+    humor_usage: "frequent",
+    signature_phrases: ["Key phrase 1", "Key phrase 2"],
+    empathy_level: "high"
+  },
+  specialization: {
+    primary_domain: "Physics",
+    specializations: ["Quantum Mechanics", "Particle Physics"],
+    min_difficulty: "beginner",
+    max_difficulty: "expert",
+    can_create_exercises: true,
+    can_grade_work: true,
+    can_create_curriculum: true,
+    external_resources: ["Resource 1", "Resource 2"]
+  },
+  adaptation: {
+    adapts_to_learning_style: true,
+    pace_adjustment: true,
+    difficulty_scaling: true,
+    remembers_context: true,
+    tracks_progress: true
+  },
+  created_at: "2025-06-09T12:00:00.000Z",
+  updated_at: "2025-06-09T12:00:00.000Z",
+  is_active: true,
+  total_sessions: 0,
+  average_rating: 4.5
+};
+```
+
+## Implementation Guidelines
+
+1. **Start with basic CRUD operations** - Create, Read, Update, Delete teachers
+2. **Implement proper error handling** - Network errors, validation errors, API errors
+3. **Add loading states** - Skeleton loaders, spinners, progress indicators
+4. **Focus on performance** - Lazy loading, pagination, debounced search
+5. **Ensure accessibility** - ARIA labels, keyboard navigation, screen reader support
+6. **Test API integration** - Mock API calls during development if needed
+7. **Use modern React patterns** - Hooks, context, functional components
+8. **Implement responsive design** - Mobile-first, flexible layouts
+9. **Add proper validation** - Client-side validation matching API requirements
+10. **Create reusable components** - DRY principles, component composition
+
+## Styling Guidelines
+
+- Use Tailwind CSS utility classes
+- Implement a consistent color scheme
+- Use proper spacing and typography scales
+- Ensure good contrast ratios for accessibility
+- Add hover and focus states for interactive elements
+- Implement smooth transitions and animations
+- Create a cohesive design system
+
+## Development Notes
+
+- The API runs on localhost:3000, adjust base URL as needed
+- Handle CORS issues if they arise
+- Implement proper error boundaries
+- Add environment variables for API configuration
+- Consider adding dark mode support
+- Plan for internationalization if needed
+
+## Expected Deliverables
+
+1. Fully functional React application
+2. Complete API integration
+3. Responsive design across all devices
+4. Proper error handling and loading states
+5. Form validation and user feedback
+6. Search and filtering capabilities
+7. Clean, maintainable code structure
+8. Basic documentation/README
+
+Create a modern, professional application that provides an intuitive interface for managing AI teachers with all their complex personality and specialization settings.
