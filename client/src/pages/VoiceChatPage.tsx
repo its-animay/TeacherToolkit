@@ -89,6 +89,7 @@ export default function VoiceChatPage() {
     try {
       conversationRef.current = await Conversation.startSession({
         agentId: selectedAgent.agentId,
+        authorization: import.meta.env.VITE_ELEVENLABS_API_KEY || process.env.ELEVENLABS_API_KEY,
         onConnect: () => {
           setConnectionStatus("connected");
           setAgentMode("listening");
@@ -354,7 +355,16 @@ export default function VoiceChatPage() {
 
                 {/* Control Buttons */}
                 <div className="flex justify-center gap-4">
-                  {connectionStatus === "disconnected" || connectionStatus === "error" ? (
+                  {connectionStatus === "connected" ? (
+                    <Button
+                      onClick={stopConversation}
+                      variant="destructive"
+                      className="px-8 py-3 text-lg"
+                    >
+                      <PhoneOff className="h-5 w-5 mr-2" />
+                      End Conversation
+                    </Button>
+                  ) : (
                     <Button
                       onClick={startConversation}
                       className="gradient-bg px-8 py-3 text-lg"
@@ -368,18 +378,9 @@ export default function VoiceChatPage() {
                       ) : (
                         <>
                           <Phone className="h-5 w-5 mr-2" />
-                          Start Conversation
+                          {connectionStatus === "error" ? "Retry Connection" : "Start Conversation"}
                         </>
                       )}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={stopConversation}
-                      variant="destructive"
-                      className="px-8 py-3 text-lg"
-                    >
-                      <PhoneOff className="h-5 w-5 mr-2" />
-                      End Conversation
                     </Button>
                   )}
                 </div>
