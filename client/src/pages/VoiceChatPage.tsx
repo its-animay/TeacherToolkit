@@ -83,13 +83,23 @@ export default function VoiceChatPage() {
     const hasPermission = await requestMicrophonePermission();
     if (!hasPermission) return;
 
+    const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
+    if (!apiKey) {
+      toast({
+        title: "API Key Missing",
+        description: "ElevenLabs API key not configured. Please check your environment settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setConnectionStatus("connecting");
     addToConversationLog("system", "Connecting to AI teacher...");
 
     try {
       conversationRef.current = await Conversation.startSession({
         agentId: selectedAgent.agentId,
-        authorization: import.meta.env.VITE_ELEVENLABS_API_KEY || process.env.ELEVENLABS_API_KEY,
+        authorization: apiKey,
         onConnect: () => {
           setConnectionStatus("connected");
           setAgentMode("listening");
