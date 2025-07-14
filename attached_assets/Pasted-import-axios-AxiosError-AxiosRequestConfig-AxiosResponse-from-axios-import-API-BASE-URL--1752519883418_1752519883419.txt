@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 18080,
   withCredentials: true, // Required to send refresh token cookie
 });
 

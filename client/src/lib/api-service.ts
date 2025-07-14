@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getUserFromStorage, removeUserFromStorage } from './auth';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8090/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL_ADMIN || 'http://localhost:8090/api/v1';
 
 // Create axios instance with base configuration
 const axiosInstance = axios.create({
@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 18080,
   withCredentials: true,
 });
 
@@ -116,7 +116,7 @@ const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
   },
   USER: {
-    PROFILE: '/user/profile',
+    PROFILE: '/users/me',
   },
 };
 

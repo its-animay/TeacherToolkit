@@ -67,7 +67,7 @@ VITE_API_BASE_URL=https://your-enhanced-teacher-api.com
 npm run dev
 ```
 
-The application will be available at `http://localhost:5000`.
+The application will be available at `http://localhost:8080`.
 
 ## API Configuration
 
