@@ -32,10 +32,11 @@ export interface InstructorTeacherMapping {
 }
 
 class EnhancedTeacherService {
-  private baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8090/api/v1';
+  private baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://mordernera.com/api/v1';
   
   private getAuthHeaders() {
-    const token = localStorage.getItem('access_token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = user.access_token;
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
