@@ -1,9 +1,13 @@
 import { Link, useLocation } from "wouter";
-import { ChartPie, Users, PlusCircle, Search, BarChart3, Presentation, MessageCircle, Settings, Brain, Mic } from "lucide-react";
+import { ChartPie, Users, PlusCircle, Search, BarChart3, Presentation, MessageCircle, Settings, Brain, Mic, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppDispatch } from "@/store/hooks";
+import { clearUser } from "@/store/userSlice";
+import { removeUserFromStorage } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: ChartPie },
+  { name: "Dashboard", href: "/dashboard", icon: ChartPie },
   { name: "All Teachers", href: "/teachers", icon: Users },
   { name: "Create Teacher", href: "/create", icon: PlusCircle },
   { name: "Search & Filter", href: "/search", icon: Search },
@@ -16,9 +20,22 @@ const navigation = [
 
 export default function Sidebar() {
   const [location] = useLocation();
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+  const [, navigate] = useLocation();
+
+  const handleLogout = () => {
+    removeUserFromStorage();
+    dispatch(clearUser());
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
+    navigate("/login");
+  };
 
   return (
-    <aside className="w-64 bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl sidebar-transition transform lg:translate-x-0 -translate-x-full fixed lg:relative z-30 h-full border-r border-slate-200">
+    <aside className="w-64 bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl h-full border-r border-slate-200 flex flex-col">
       <div className="p-6 border-b border-slate-200">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 gradient-bg rounded-2xl flex items-center justify-center shadow-lg animate-float">
@@ -31,7 +48,8 @@ export default function Sidebar() {
         </div>
       </div>
       
-      <nav className="p-4">
+      {/* Scrollable navigation */}
+      <nav className="flex-1 overflow-y-auto p-4">
         <ul className="space-y-2">
           {navigation.map((item) => {
             const isActive = location === item.href;
@@ -54,6 +72,17 @@ export default function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Logout button at bottom */}
+      <div className="p-4 border-t border-slate-200">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-slate-700 hover:bg-red-50 hover:text-red-600"
+        >
+          <LogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </div>
     </aside>
   );
 }
