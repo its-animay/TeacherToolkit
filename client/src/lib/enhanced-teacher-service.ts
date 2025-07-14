@@ -44,9 +44,7 @@ class EnhancedTeacherService {
   }
 
   async getTeacher(teacherId: string): Promise<EnhancedTeacher> {
-    const response = await apiRequest(`${this.baseUrl}/enhanced-teacher/${teacherId}`, {
-      headers: this.getAuthHeaders(),
-    });
+    const response = await apiRequest("GET", `${this.baseUrl}/enhanced-teacher/${teacherId}`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch teacher: ${response.status}`);
@@ -57,9 +55,7 @@ class EnhancedTeacherService {
 
   async getTeacherByInstructor(instructorId: string): Promise<EnhancedTeacher | null> {
     try {
-      const response = await apiRequest(`${this.baseUrl}/enhanced-teacher/by-instructor/${instructorId}`, {
-        headers: this.getAuthHeaders(),
-      });
+      const response = await apiRequest("GET", `${this.baseUrl}/enhanced-teacher/by-instructor/${instructorId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -76,9 +72,7 @@ class EnhancedTeacherService {
   }
 
   async getAllTeachers(): Promise<EnhancedTeacher[]> {
-    const response = await apiRequest(`${this.baseUrl}/enhanced-teacher`, {
-      headers: this.getAuthHeaders(),
-    });
+    const response = await apiRequest("GET", `${this.baseUrl}/enhanced-teacher`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch teachers: ${response.status}`);
@@ -89,9 +83,7 @@ class EnhancedTeacherService {
 
   async getInstructorTeacherMappings(): Promise<InstructorTeacherMapping[]> {
     try {
-      const response = await apiRequest(`${this.baseUrl}/instructor-teacher-mappings`, {
-        headers: this.getAuthHeaders(),
-      });
+      const response = await apiRequest("GET", `${this.baseUrl}/instructor-teacher-mappings`);
       
       if (!response.ok) {
         return [];
@@ -102,6 +94,36 @@ class EnhancedTeacherService {
       console.error('Error fetching instructor-teacher mappings:', error);
       return [];
     }
+  }
+
+  async createTeacher(teacherData: any): Promise<EnhancedTeacher> {
+    const response = await apiRequest("POST", `${this.baseUrl}/enhanced-teacher`, teacherData);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to create teacher: ${response.status}`);
+    }
+    
+    return response.json();
+  }
+
+  async updateTeacher(teacherId: string, teacherData: any): Promise<EnhancedTeacher> {
+    const response = await apiRequest("PUT", `${this.baseUrl}/enhanced-teacher/${teacherId}`, teacherData);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update teacher: ${response.status}`);
+    }
+    
+    return response.json();
+  }
+
+  async deleteTeacher(teacherId: string): Promise<boolean> {
+    const response = await apiRequest("DELETE", `${this.baseUrl}/enhanced-teacher/${teacherId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to delete teacher: ${response.status}`);
+    }
+    
+    return true;
   }
 }
 

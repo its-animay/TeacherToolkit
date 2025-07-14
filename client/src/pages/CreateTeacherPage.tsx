@@ -11,6 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import type { InsertTeacher } from "@shared/schema";
 import { instructorService } from "@/lib/instructor-service";
+import { enhancedTeacherService } from "@/lib/enhanced-teacher-service";
 
 export default function CreateTeacherPage() {
   const [location, setLocation] = useLocation();
@@ -34,7 +35,7 @@ export default function CreateTeacherPage() {
   const { data: existingTeacher, isLoading: isLoadingTeacher } = useTeacher(editId || "");
 console.log(instructor, "instructor")
   const createMutation = useMutation({
-    mutationFn: teacherApi.createTeacher,
+    mutationFn: (data: InsertTeacher) => enhancedTeacherService.createTeacher(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/enhanced-teacher"] });
       queryClient.invalidateQueries({ queryKey: ['instructors'] });
@@ -66,7 +67,7 @@ console.log(instructor, "instructor")
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<InsertTeacher> }) =>
-      teacherApi.updateTeacher(id, data),
+      enhancedTeacherService.updateTeacher(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/enhanced-teacher"] });
       queryClient.invalidateQueries({ queryKey: [`/enhanced-teacher/${data.id}`] });
