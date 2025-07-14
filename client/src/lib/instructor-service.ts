@@ -87,6 +87,14 @@ class InstructorService {
     });
   }
 
+  async getInstructor(id: string): Promise<Instructor> {
+    const response = await axios.get(`${this.baseUrl}/instructors/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
+
+    return response.data;
+  }
+
   async updateInstructor(id: string, data: Partial<CreateInstructorData>): Promise<Instructor> {
     const payload = new URLSearchParams();
     payload.append('instructor_data', JSON.stringify(data));

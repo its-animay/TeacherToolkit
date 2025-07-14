@@ -119,6 +119,14 @@ function AppRouter() {
         </ProtectedRoute>
       </Route>
       
+      <Route path="/create-ai-teacher/:instructorId">
+        <ProtectedRoute>
+          <Layout>
+            <CreateTeacherPage />
+          </Layout>
+        </ProtectedRoute>
+      </Route>
+      
       <Route path="/search">
         <ProtectedRoute>
           <Layout>

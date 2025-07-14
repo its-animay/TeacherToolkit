@@ -32,7 +32,9 @@ A comprehensive React application for managing AI teachers through multiple API 
 - **New Page**: "Instructor Management" replaces "All Teachers" in navigation
 - **API Integration**: Connected to https://mordernera.com/api/v1/instructor endpoints
 - **Instructor CRUD**: Create, read, update, delete instructor functionality
-- **Create AI Teacher**: Direct integration to convert instructors to AI teachers
+- **Create AI Teacher Flow**: Integrated with existing multi-step AI teacher creation
+- **Pre-filled Data**: Instructor data auto-populates teacher form (name, avatar, bio, email)
+- **Route Integration**: /create-ai-teacher/:instructorId for instructor-based creation
 - **Authentication**: Bearer token authentication for all instructor API calls
 
 ### Voice Chat Integration
@@ -75,4 +77,6 @@ The application is fully functional with:
 - Voice chat capabilities with ElevenLabs
 - Multiple API integrations with proper authentication
 - Modern responsive design with gradient effects
-- Create AI Teacher functionality from instructor profiles
+- Integrated Create AI Teacher flow with instructor pre-filling
+- Multi-step AI teacher creation (Basic Info, Personality, Specialization)
+- Seamless navigation between instructor management and AI teacher creation

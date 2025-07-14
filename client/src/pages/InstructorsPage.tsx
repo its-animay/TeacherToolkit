@@ -7,14 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { instructorService, Instructor, CreateInstructorData } from "@/lib/instructor-service";
-import { teacherApi } from "@/lib/api";
-import { InsertTeacher } from "@/shared/schema";
 import InstructorCard from "@/components/instructors/InstructorCard";
 import CreateInstructorModal from "@/components/instructors/CreateInstructorModal";
 
 export default function InstructorsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [creatingAITeacher, setCreatingAITeacher] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -48,52 +45,9 @@ export default function InstructorsPage() {
     },
   });
 
-  const createAITeacherMutation = useMutation({
-    mutationFn: (data: InsertTeacher) => teacherApi.createTeacher(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teachers'] });
-      toast({
-        title: "Success",
-        description: "AI Teacher created successfully!",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create AI teacher",
-        variant: "destructive",
-      });
-    },
-    onSettled: () => {
-      setCreatingAITeacher(null);
-    },
-  });
-
   const handleCreateAITeacher = async (instructor: Instructor) => {
-    setCreatingAITeacher(instructor.id);
-    
-    const aiTeacherData: InsertTeacher = {
-      name: instructor.full_name,
-      domain: "General Education",
-      teaching_style: "Interactive and engaging",
-      personality_traits: ["Knowledgeable", "Patient", "Encouraging"],
-      expertise_areas: ["Teaching", "Education", "Student Engagement"],
-      bio: instructor.bio || `AI Teacher created from instructor ${instructor.full_name}`,
-      avatar_url: instructor.avatar_url || "",
-      email: instructor.email,
-      background: `Instructor profile: ${instructor.full_name}`,
-      preferred_language: "English",
-      difficulty_level: "intermediate",
-      max_session_length: 60,
-      response_time: "fast",
-      availability: "24/7",
-      session_count: 0,
-      average_rating: 0,
-      total_ratings: 0,
-      is_active: true,
-    };
-
-    createAITeacherMutation.mutate(aiTeacherData);
+    // Navigate to the create AI teacher flow with pre-filled instructor data
+    window.location.href = `/create-ai-teacher/${instructor.id}`;
   };
 
   const handleDeleteInstructor = async (instructor: Instructor) => {
@@ -287,7 +241,7 @@ export default function InstructorsPage() {
               instructor={instructor}
               onCreateAITeacher={handleCreateAITeacher}
               onDelete={handleDeleteInstructor}
-              isCreatingAITeacher={creatingAITeacher === instructor.id}
+              isCreatingAITeacher={false}
             />
           ))}
         </div>
