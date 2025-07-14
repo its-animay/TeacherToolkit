@@ -7,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { instructorService, Instructor, CreateInstructorData } from "@/lib/instructor-service";
+import { enhancedTeacherService, EnhancedTeacher } from "@/lib/enhanced-teacher-service";
 import InstructorCard from "@/components/instructors/InstructorCard";
 import CreateInstructorModal from "@/components/instructors/CreateInstructorModal";
 
 export default function InstructorsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [instructorTeachers, setInstructorTeachers] = useState<Record<string, EnhancedTeacher>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -26,6 +28,36 @@ export default function InstructorsPage() {
     retry: 2,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Fetch linked teachers for each instructor
+  useEffect(() => {
+    if (instructorsData?.instructors) {
+      const fetchTeachers = async () => {
+        const teacherPromises = instructorsData.instructors.map(async (instructor) => {
+          try {
+            const teacher = await enhancedTeacherService.getTeacherByInstructor(instructor.id);
+            return { instructorId: instructor.id, teacher };
+          } catch (error) {
+            console.error(`Error fetching teacher for instructor ${instructor.id}:`, error);
+            return { instructorId: instructor.id, teacher: null };
+          }
+        });
+
+        const results = await Promise.all(teacherPromises);
+        const teachersMap: Record<string, EnhancedTeacher> = {};
+        
+        results.forEach(({ instructorId, teacher }) => {
+          if (teacher) {
+            teachersMap[instructorId] = teacher;
+          }
+        });
+
+        setInstructorTeachers(teachersMap);
+      };
+
+      fetchTeachers();
+    }
+  }, [instructorsData]);
 
   const createInstructorMutation = useMutation({
     mutationFn: (data: CreateInstructorData) => instructorService.createInstructor(data),
@@ -46,8 +78,14 @@ export default function InstructorsPage() {
   });
 
   const handleCreateAITeacher = async (instructor: Instructor) => {
-    // Navigate to the create AI teacher flow with pre-filled instructor data
-    window.location.href = `/create-ai-teacher/${instructor.id}`;
+    // Check if teacher already exists
+    if (instructorTeachers[instructor.id]) {
+      // Navigate to teacher view/edit
+      window.location.href = `/teachers/${instructorTeachers[instructor.id].id}`;
+    } else {
+      // Navigate to the create AI teacher flow with pre-filled instructor data
+      window.location.href = `/create-ai-teacher/${instructor.id}`;
+    }
   };
 
   const handleDeleteInstructor = async (instructor: Instructor) => {
@@ -242,6 +280,7 @@ export default function InstructorsPage() {
               onCreateAITeacher={handleCreateAITeacher}
               onDelete={handleDeleteInstructor}
               isCreatingAITeacher={false}
+              linkedTeacher={instructorTeachers[instructor.id]}
             />
           ))}
         </div>

@@ -1,0 +1,84 @@
+Please finalize the Create AI Teacher flow with the following fixes and integrations:
+
+✅ 1. Fix API Call Placement in Multi-Step Flow
+The current Create AI Teacher API is being called at Step 2 (Personality) — this is incorrect.
+
+Move the API call to the final step (Step 3: Specialization) so that:
+
+All data from Step 1 (Basic Info), Step 2 (Personality), and Step 3 (Specialization) is merged
+
+Then submitted as a single POST request to create the AI teacher
+
+✅ 2. Link Created AI Teacher to Instructor
+When a user clicks “Create AI Teacher” on an Instructor card:
+
+Redirect to /create-ai-teacher/:instructorId
+
+Prefill the multi-step form using instructor data (name, avatar, bio, etc.)
+
+On final submit, include instructorId in the request payload
+
+✅ 3. Fetch Created AI Teacher and Update CTA
+After successful creation:
+
+Call the following API to retrieve the created AI teacher:
+
+http
+Copy
+Edit
+GET /api/v1/enhanced-teacher/{teacher_id}
+Authorization: Bearer <access_token>
+Show the teacher data linked to the instructor
+
+Update the CTA on the Instructor card from:
+
+css
+Copy
+Edit
+[ Create AI Teacher ]
+to:
+
+css
+Copy
+Edit
+[ View AI Teacher ]
+This button should open the AI teacher profile view or edit screen.
+
+✅ 4. Validation Rules to Enforce
+In Step 2 (Personality):
+primary_traits: max 3 traits can be selected
+
+Add frontend validation with message: You can select up to 3 primary traits
+
+teaching_style, formality_level, humor_usage, etc. — all required
+
+Add required field warnings to all fields in this step
+
+In Step 3 (Specialization):
+specializations: required
+
+primary_domain: required
+
+min_difficulty ≤ max_difficulty
+
+At least one capability checkbox (can_create_exercises, can_grade_work, etc.) should be selected
+
+In Step 1:
+name, avatar_url, and system_prompt_template must not be empty
+
+✅ 5. Show Linked AI Teacher with Instructor
+When loading Instructor Management:
+
+Check if each instructor has an associated AI teacher
+
+If yes, change the CTA to View AI Teacher
+
+Optionally show AI teacher metadata like:
+
+Created at
+
+Total sessions
+
+Rating
+
+Clicking View AI Teacher opens a detailed profile view using the enhanced teacher API data

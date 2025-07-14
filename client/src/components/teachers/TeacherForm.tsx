@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertTeacherSchema, type InsertTeacher } from "@shared/schema";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,6 +54,7 @@ const DIFFICULTY_LEVELS = [
 
 export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoading }: TeacherFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [stepErrors, setStepErrors] = useState<Record<number, string[]>>({});
 
   const form = useForm<InsertTeacher>({
     resolver: zodResolver(insertTeacherSchema),
@@ -63,17 +65,17 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
       system_prompt_template: "You are {teacher_name}, {title}.\n\n{personality}\n\n{domain}\n\nYour teaching approach is {teaching_style} and you specialize in {specializations}.",
       personality: {
         primary_traits: [],
-        teaching_style: "explanatory",
-        formality_level: "casual",
-        question_frequency: "medium",
-        encouragement_level: "high",
-        response_length: "moderate",
+        teaching_style: "",
+        formality_level: "",
+        question_frequency: "",
+        encouragement_level: "",
+        response_length: "",
         use_examples: true,
         use_analogies: true,
-        patience_level: "high",
-        humor_usage: "occasional",
+        patience_level: "",
+        humor_usage: "",
         signature_phrases: [],
-        empathy_level: "high"
+        empathy_level: ""
       },
       specialization: {
         primary_domain: "",
@@ -97,8 +99,45 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
     }
   });
 
+  const validateStep = (step: number): boolean => {
+    const errors: string[] = [];
+    const values = form.getValues();
+
+    if (step === 1) {
+      if (!values.name?.trim()) errors.push("Teacher Name is required");
+      if (!values.avatar_url?.trim()) errors.push("Avatar URL is required");
+      if (!values.system_prompt_template?.trim()) errors.push("System Prompt Template is required");
+    } else if (step === 2) {
+      if (!values.personality?.teaching_style) errors.push("Teaching Style is required");
+      if (!values.personality?.formality_level) errors.push("Formality Level is required");
+      if (!values.personality?.humor_usage) errors.push("Humor Usage is required");
+      if (!values.personality?.question_frequency) errors.push("Question Frequency is required");
+      if (!values.personality?.encouragement_level) errors.push("Encouragement Level is required");
+      if (!values.personality?.response_length) errors.push("Response Length is required");
+      if (!values.personality?.patience_level) errors.push("Patience Level is required");
+      if (!values.personality?.empathy_level) errors.push("Empathy Level is required");
+      if (values.personality?.primary_traits?.length === 0) errors.push("At least one primary trait is required");
+      if ((values.personality?.primary_traits?.length || 0) > 3) errors.push("You can select up to 3 primary traits");
+    } else if (step === 3) {
+      if (!values.specialization?.primary_domain?.trim()) errors.push("Primary Domain is required");
+      if (!values.specialization?.specializations?.length) errors.push("Specializations are required");
+      
+      const minDiff = ["beginner", "intermediate", "advanced", "expert"].indexOf(values.specialization?.min_difficulty || "beginner");
+      const maxDiff = ["beginner", "intermediate", "advanced", "expert"].indexOf(values.specialization?.max_difficulty || "expert");
+      if (minDiff > maxDiff) errors.push("Minimum difficulty must be less than or equal to maximum difficulty");
+      
+      const hasCapability = values.specialization?.can_create_exercises || 
+                          values.specialization?.can_grade_work || 
+                          values.specialization?.can_create_curriculum;
+      if (!hasCapability) errors.push("At least one capability must be selected");
+    }
+
+    setStepErrors(prev => ({ ...prev, [step]: errors }));
+    return errors.length === 0;
+  };
+
   const nextStep = () => {
-    if (currentStep < STEPS.length) {
+    if (validateStep(currentStep) && currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -110,7 +149,9 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
   };
 
   const handleSubmit = (data: InsertTeacher) => {
-    onSubmit(data);
+    if (validateStep(3)) {
+      onSubmit(data);
+    }
   };
 
   const handleSaveDraft = () => {
@@ -255,7 +296,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                     name="personality.teaching_style"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Teaching Style</FormLabel>
+                        <FormLabel>Teaching Style *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -280,7 +321,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                     name="personality.formality_level"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Formality Level</FormLabel>
+                        <FormLabel>Formality Level *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -303,7 +344,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                     name="personality.question_frequency"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Question Frequency</FormLabel>
+                        <FormLabel>Question Frequency *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -326,7 +367,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                     name="personality.humor_usage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Humor Usage</FormLabel>
+                        <FormLabel>Humor Usage *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -344,6 +385,98 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                       </FormItem>
                     )}
                   />
+                  
+                  <FormField
+                    control={form.control}
+                    name="personality.encouragement_level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Encouragement Level *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select encouragement level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="personality.response_length"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Response Length *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select response length" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="brief">Brief</SelectItem>
+                            <SelectItem value="moderate">Moderate</SelectItem>
+                            <SelectItem value="detailed">Detailed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="personality.patience_level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Patience Level *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select patience level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="personality.empathy_level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Empathy Level *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select empathy level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <FormField
@@ -351,17 +484,18 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                   name="personality.primary_traits"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Primary Traits</FormLabel>
+                      <FormLabel>Primary Traits (max 3) *</FormLabel>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {PERSONALITY_TRAITS.map((trait) => (
                           <div key={trait} className="flex items-center space-x-2">
                             <Checkbox
                               id={trait}
                               checked={field.value.includes(trait)}
+                              disabled={!field.value.includes(trait) && field.value.length >= 3}
                               onCheckedChange={(checked) => {
-                                if (checked) {
+                                if (checked && field.value.length < 3) {
                                   field.onChange([...field.value, trait]);
-                                } else {
+                                } else if (!checked) {
                                   field.onChange(field.value.filter((t) => t !== trait));
                                 }
                               }}
@@ -372,6 +506,9 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                           </div>
                         ))}
                       </div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Selected: {field.value.length}/3
+                      </p>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -501,8 +638,29 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                   />
                 </div>
 
+                <FormField
+                  control={form.control}
+                  name="specialization.specializations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Specializations *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter specializations separated by commas"
+                          value={field.value?.join(', ') || ''}
+                          onChange={(e) => {
+                            const specs = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                            field.onChange(specs);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div>
-                  <Label className="text-base font-medium">Capabilities</Label>
+                  <Label className="text-base font-medium">Capabilities (at least one required) *</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                     <FormField
                       control={form.control}
@@ -693,6 +851,20 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
                   )}
                 </div>
               </div>
+              
+              {/* Display validation errors if any */}
+              {stepErrors[currentStep] && stepErrors[currentStep].length > 0 && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="text-red-700">
+                    <h3 className="font-semibold mb-2">Please fix the following errors:</h3>
+                    <ul className="list-disc list-inside space-y-1">
+                      {stepErrors[currentStep].map((error, index) => (
+                        <li key={index} className="text-sm">{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </form>

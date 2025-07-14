@@ -11,6 +11,7 @@ interface InstructorCardProps {
   onEdit?: (instructor: Instructor) => void;
   onDelete?: (instructor: Instructor) => void;
   isCreatingAITeacher?: boolean;
+  linkedTeacher?: any;
 }
 
 export default function InstructorCard({ 
@@ -18,7 +19,8 @@ export default function InstructorCard({
   onCreateAITeacher, 
   onEdit, 
   onDelete,
-  isCreatingAITeacher = false 
+  isCreatingAITeacher = false,
+  linkedTeacher
 }: InstructorCardProps) {
   const initials = instructor.full_name
     .split(' ')
@@ -67,6 +69,22 @@ export default function InstructorCard({
             </p>
           )}
           
+          {linkedTeacher && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
+              <div className="flex items-center space-x-2">
+                <Badge variant="default" className="bg-green-100 text-green-800">
+                  AI Teacher Linked
+                </Badge>
+                <span className="text-sm font-medium text-green-800">
+                  {linkedTeacher.name}
+                </span>
+              </div>
+              <p className="text-xs text-green-600 mt-1">
+                Domain: {linkedTeacher.domain}
+              </p>
+            </div>
+          )}
+          
           <div className="flex items-center justify-between pt-3 border-t">
             <div className="flex space-x-2">
               <Button
@@ -104,7 +122,7 @@ export default function InstructorCard({
               ) : (
                 <>
                   <Brain className="h-4 w-4 mr-2" />
-                  Create AI Teacher
+                  {linkedTeacher ? "View AI Teacher" : "Create AI Teacher"}
                 </>
               )}
             </Button>
