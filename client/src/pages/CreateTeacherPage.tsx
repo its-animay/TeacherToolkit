@@ -32,7 +32,7 @@ export default function CreateTeacherPage() {
   });
 
   const { data: existingTeacher, isLoading: isLoadingTeacher } = useTeacher(editId || "");
-
+console.log(instructor, "instructor")
   const createMutation = useMutation({
     mutationFn: teacherApi.createTeacher,
     onSuccess: (data) => {
@@ -40,7 +40,7 @@ export default function CreateTeacherPage() {
       queryClient.invalidateQueries({ queryKey: ['instructors'] });
       
       const successMessage = instructorId && instructor 
-        ? `AI Teacher created for ${instructor.full_name} 🎉`
+        ? `AI Teacher created for ${instructor?.instructor?.full_name} 🎉`
         : "Teacher created successfully";
       
       toast({
@@ -87,7 +87,7 @@ export default function CreateTeacherPage() {
 
   const handleSubmit = (data: InsertTeacher) => {
     // Add instructor ID to the payload if creating from instructor
-    const teacherData = instructorId ? { ...data, instructorId } : data;
+    const teacherData = instructorId ? { ...data, id:instructorId } : data;
     
     if (editId && existingTeacher) {
       updateMutation.mutate({ id: editId, data: teacherData });
@@ -109,15 +109,15 @@ export default function CreateTeacherPage() {
   const getInitialData = (): Partial<InsertTeacher> => {
     if (instructorId && instructor) {
       return {
-        name: instructor.full_name,
-        avatar_url: instructor.avatar_url || "",
-        bio: instructor.bio || "",
-        email: instructor.email,
+        name: instructor?.instructor?.full_name,
+        avatar_url: instructor?.instructor?.avatar_url || "",
+        bio: instructor?.instructor?.bio || "",
+        email: instructor?.instructor?.email,
         domain: "General Education",
         teaching_style: "Interactive and engaging",
         personality_traits: ["Knowledgeable", "Patient", "Encouraging"],
         expertise_areas: ["Teaching", "Education", "Student Engagement"],
-        background: `Created from instructor profile: ${instructor.full_name}`,
+        background: `Created from instructor profile: ${instructor?.instructor?.full_name}`,
         preferred_language: "English",
         difficulty_level: "intermediate",
         max_session_length: 60,
@@ -198,7 +198,7 @@ export default function CreateTeacherPage() {
               {isEdit 
                 ? "Edit AI Teacher" 
                 : instructorId && instructor 
-                  ? `Create AI Teacher for ${instructor.full_name}`
+                  ? `Create AI Teacher for ${instructor?.instructor?.full_name}`
                   : "Create New AI Teacher"
               }
             </h1>

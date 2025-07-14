@@ -59,10 +59,11 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
   const form = useForm<InsertTeacher>({
     resolver: zodResolver(insertTeacherSchema),
     defaultValues: {
+  
       name: "",
       title: "",
       avatar_url: "",
-      system_prompt_template: "You are {teacher_name}, {title}.\n\n{personality}\n\n{domain}\n\nYour teaching approach is {teaching_style} and you specialize in {specializations}.",
+     system_prompt_template: "You are {teacher_name}, a {title} known for your {style} teaching style.\n\n{personality}\n\nYou specialize in {specializations} within the domain of {domain}.\n\nYour preferred approach to instruction is {teaching_style}.",
       personality: {
         primary_traits: [],
         teaching_style: "",
