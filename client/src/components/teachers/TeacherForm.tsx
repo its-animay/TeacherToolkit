@@ -63,7 +63,7 @@ export default function TeacherForm({ initialData, onSubmit, onSaveDraft, isLoad
       name: "",
       title: "",
       avatar_url: "",
-     system_prompt_template: "You are {teacher_name}, a {title} known for your {style} teaching style.\n\n{personality}\n\nYou specialize in {specializations} within the domain of {domain}.\n\nYour preferred approach to instruction is {teaching_style}.",
+system_prompt_template: "You are {teacher_name}, a {title} known for your {style} teaching style.\n\n{personality}\n\nYou specialize in {specializations} within the domain of {domain}.\n\nYour preferred approach to instruction is {teaching_style}.",
       personality: {
         primary_traits: [],
         teaching_style: "",
