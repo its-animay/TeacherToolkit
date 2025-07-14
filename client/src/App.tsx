@@ -14,6 +14,7 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import TeachersPage from "@/pages/TeachersPage";
+import InstructorsPage from "@/pages/InstructorsPage";
 import TeacherDetailPage from "@/pages/TeacherDetailPage";
 import CreateTeacherPage from "@/pages/CreateTeacherPage";
 import SearchPage from "@/pages/SearchPage";
@@ -74,6 +75,14 @@ function AppRouter() {
         <ProtectedRoute>
           <Layout>
             <TeachersPage />
+          </Layout>
+        </ProtectedRoute>
+      </Route>
+      
+      <Route path="/instructors">
+        <ProtectedRoute>
+          <Layout>
+            <InstructorsPage />
           </Layout>
         </ProtectedRoute>
       </Route>

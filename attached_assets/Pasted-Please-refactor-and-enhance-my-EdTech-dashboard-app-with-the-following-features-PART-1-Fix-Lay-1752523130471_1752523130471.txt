@@ -1,0 +1,161 @@
+Please refactor and enhance my EdTech dashboard app with the following features:
+
+🎯 PART 1: Fix Layout (Sidebar, Header, Main Canvas)
+Update the layout so that:
+
+✅ Sidebar:
+position: fixed
+
+height: 100vh
+
+overflow-y: auto
+
+Always visible on the left side
+
+✅ Header:
+Fixed at the top
+
+Starts right after the sidebar
+
+Full width of the screen minus sidebar width (left-64)
+
+✅ Main Content:
+Appears to the right of the sidebar, below the header
+
+Should scroll independently (not the whole page)
+
+Use:
+
+tsx
+Copy
+Edit
+<main className="mt-16 ml-64 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+✅ Full Layout Structure:
+tsx
+Copy
+Edit
+<div className="flex h-screen overflow-hidden">
+  {/* Sidebar */}
+  <aside className="w-64 fixed top-0 left-0 h-screen overflow-y-auto bg-white border-r z-20">
+    {/* Sidebar content */}
+  </aside>
+
+  {/* Header + Page Content */}
+  <div className="flex flex-col flex-1 ml-64">
+    <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b z-30">
+      {/* Header */}
+    </header>
+
+    <main className="mt-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+      {/* Page routes */}
+    </main>
+  </div>
+</div>
+👩‍🏫 PART 2: Replace “All Teachers” with “Instructor Management”
+Update the /all-teachers page to show instructors using the following API:
+
+🔹 List Instructors API:
+bash
+Copy
+Edit
+GET https://mordernera.com/api/v1/instructor/instructors?skip=0&limit=50&sort_by=created_at&sort_dir=desc
+Headers:
+
+makefile
+Copy
+Edit
+Authorization: Bearer <access_token>
+Accept: application/json
+🔸 Response:
+json
+Copy
+Edit
+{
+  "instructors": [
+    {
+      "id": "6834cfd97ee6939c44fdf063",
+      "email": "instructor@example.com",
+      "username": "sarahjohnson",
+      "full_name": "Dr. Sarah Johnson",
+      "avatar_url": "https://example.com/avatars/sarah.jpg",
+      "bio": "AI and ML expert...",
+      "is_active": true
+    }
+  ],
+  "total": 2,
+  "skip": 0,
+  "limit": 50
+}
+Display a list/grid of cards showing:
+
+Full name
+
+Email
+
+Avatar
+
+Bio
+
+CTA: "Create AI Teacher" button
+
+🧑‍💻 PART 3: Create Instructor Flow
+Add a + Create Instructor button that opens a form/modal and on submit:
+
+🔹 Create Instructor API:
+bash
+Copy
+Edit
+POST https://mordernera.com/api/v1/instructor/create-instructor
+Headers:
+
+makefile
+Copy
+Edit
+Authorization: Bearer <access_token>
+Content-Type: application/x-www-form-urlencoded
+Payload format (key = instructor_data as a URL-encoded JSON string):
+
+json
+Copy
+Edit
+{
+  "email": "priya.sharma@edutechacademy.com",
+  "password": "TeachCS2025!",
+  "full_name": "Dr. Priya Sharma",
+  "username": "priyasharma",
+  "phone_number": "+919876543210",
+  "avatar_url": "https://edutech-profiles.s3.amazonaws.com/instructors/sharma_priya.jpg",
+  "bio": "Computer Science Ph.D. specializing in ML and AI..."
+}
+Convert this to:
+
+ts
+Copy
+Edit
+const payload = new URLSearchParams();
+payload.append("instructor_data", JSON.stringify(formValues));
+🧠 PART 4: “Create AI Teacher” CTA
+For each instructor listed:
+
+Add a "Create AI Teacher" button
+
+On click:
+
+Call your existing AI teacher creation API
+
+Use the instructor's email, full_name, bio, etc.
+
+On success, show a toast and mark instructor as linked
+
+✅ Checklist
+ Layout is fixed: sidebar, header, canvas scroll correctly
+
+ /all-teachers shows instructors from the API
+
+ Instructors can be created using a modal + API
+
+ Each instructor card shows a "Create AI Teacher" CTA
+
+ All authenticated requests use:
+Authorization: Bearer <access_token>
+(taken from Redux or localStorage)

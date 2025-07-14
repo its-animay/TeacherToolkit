@@ -14,11 +14,11 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Fixed Sidebar - Full viewport height */}
-      <div className="fixed left-0 top-0 h-full w-64 z-30 lg:static lg:z-auto">
+    <div className="flex h-screen overflow-hidden">
+      {/* Fixed Sidebar */}
+      <aside className="w-64 fixed top-0 left-0 h-screen overflow-y-auto bg-white border-r z-20">
         <Sidebar />
-      </div>
+      </aside>
       
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -28,20 +28,16 @@ export default function Layout({ children }: LayoutProps) {
         />
       )}
 
-      {/* Main content area - with left margin to account for fixed sidebar */}
-      <main className="flex-1 flex flex-col min-w-0 lg:ml-64">
-        {/* Fixed Header - Full width aligned right of sidebar */}
-        <div className="fixed top-0 right-0 left-0 lg:left-64 z-20 bg-background/80 backdrop-blur-sm border-b">
+      {/* Header + Page Content */}
+      <div className="flex flex-col flex-1 ml-64">
+        <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b z-30">
           <Header onSidebarToggle={toggleSidebar} />
-        </div>
-        
-        {/* Scrollable content area - with top margin to account for fixed header */}
-        <div className="flex-1 overflow-auto pt-16">
-          <div className="p-6">
-            {children}
-          </div>
-        </div>
-      </main>
+        </header>
+
+        <main className="mt-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

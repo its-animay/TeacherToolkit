@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: ChartPie },
-  { name: "All Teachers", href: "/teachers", icon: Users },
+  { name: "Instructor Management", href: "/instructors", icon: Users },
   { name: "Create Teacher", href: "/create", icon: PlusCircle },
   { name: "Search & Filter", href: "/search", icon: Search },
   { name: "Chat Demo", href: "/chat", icon: MessageCircle },
@@ -35,7 +35,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl h-full border-r border-slate-200 flex flex-col">
+    <div className="w-64 bg-gradient-to-br from-slate-50 to-slate-100 shadow-xl h-full border-r border-slate-200 flex flex-col">
       <div className="p-6 border-b border-slate-200">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 gradient-bg rounded-2xl flex items-center justify-center shadow-lg animate-float">
@@ -83,6 +83,6 @@ export default function Sidebar() {
           <span>Logout</span>
         </button>
       </div>
-    </aside>
+    </div>
   );
 }
